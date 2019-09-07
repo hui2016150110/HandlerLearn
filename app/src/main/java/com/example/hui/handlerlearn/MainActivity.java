@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button sendButton;
     private Button receiveButton;
     private ProgressBar progressBar;
-    private Button task1,task2,change;
+    private Button task1,task2,change,stop;
     private TextView getRandom;
     private HandlerThread handlerThread;
     private Handler subHandler;
@@ -104,6 +104,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(MainActivity.this,MyIntentService.class);
                 intent.setAction("down.vid");
                 startService(intent);
+            }
+        });
+
+        stop = findViewById(R.id.stop);
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService(new Intent(MainActivity.this,MyIntentService.class));
             }
         });
 
