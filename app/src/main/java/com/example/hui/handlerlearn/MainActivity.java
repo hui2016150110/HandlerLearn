@@ -1,6 +1,9 @@
 package com.example.hui.handlerlearn;
 
 import androidx.appcompat.app.AppCompatActivity;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,17 +23,29 @@ import android.widget.Toast;
 
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity{
 
     private final String TAG = "MainActivity";
     private MyBroadCastReceiver myBroadCastReceiver;
     private final int CHANGEUI = 1;
     private final int GETRANDOM = 2;
-    private Button sendButton;
-    private Button receiveButton;
-    private ProgressBar progressBar;
-    private Button task1,task2,change,stop;
-    private TextView getRandom;
+    @BindView(R2.id.send)
+    protected Button sendButton;
+    @BindView(R2.id.receive)
+    protected Button receiveButton;
+    @BindView(R2.id.progressBar)
+    protected ProgressBar progressBar;
+    @BindView(R2.id.task1)
+    protected Button task1;
+    @BindView(R2.id.task2)
+    protected Button task2;
+    @BindView(R2.id.change)
+    protected Button change;
+    @BindView(R2.id.stop)
+    protected Button stop;
+    @BindView(R2.id.random)
+    protected TextView getRandom;
+
     private HandlerThread handlerThread;
     private Handler subHandler;
     Random random = new Random();
@@ -52,25 +67,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         init();
     }
 
     private void init(){
-        sendButton = findViewById(R.id.send);
-        receiveButton = findViewById(R.id.receive);
-        sendButton.setOnClickListener(this);
-        getRandom = findViewById(R.id.random);
-        change = findViewById(R.id.change);
-        change.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(handlerThread!=null){
-                    Message message = new Message();
-                    message.what = CHANGEUI;
-                    subHandler.sendMessage(message);
-                }
-            }
-        });
 
         handlerThread = new HandlerThread("myThread");
         handlerThread.start();
@@ -87,36 +88,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
 
-        task1 = findViewById(R.id.task1);
-        task1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,MyIntentService.class);
-                intent.setAction("down.image");
-                startService(intent);
-            }
-        });
-
-        task2 = findViewById(R.id.task2);
-        task2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,MyIntentService.class);
-                intent.setAction("down.vid");
-                startService(intent);
-            }
-        });
-
-        stop = findViewById(R.id.stop);
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopService(new Intent(MainActivity.this,MyIntentService.class));
-            }
-        });
-
-        progressBar = findViewById(R.id.progressBar);
-
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.hui.handlerlearn.mybroadcast");
         //通过代码动态注册广播
@@ -125,18 +96,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.send:
-                sendMessageOnChildThread();
-                break;
 
-        }
-    }
 
     //在子线程中发送消息，然后在主线程中改变receiveButton中的值
-    private void sendMessageOnChildThread(){
+    @OnClick(R.id.send)
+    protected void sendMessageOnChildThread(){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -162,6 +126,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 },2000);
             }
         }).start();
+    }
+
+    @OnClick(R.id.change)
+    protected void change(){
+        if(handlerThread!=null){
+            Message message = new Message();
+            message.what = CHANGEUI;
+            subHandler.sendMessage(message);
+        }
+    }
+
+    @OnClick(R.id.task1)
+    protected void startTask1(){
+        Intent intent = new Intent(MainActivity.this,MyIntentService.class);
+        intent.setAction("down.image");
+        startService(intent);
+    }
+
+    @OnClick(R.id.task2)
+    protected void startTask2(){
+        Intent intent = new Intent(MainActivity.this,MyIntentService.class);
+        intent.setAction("down.vid");
+        startService(intent);
+    }
+
+    @OnClick(R.id.stop)
+    protected void stopTask(){
+        stopService(new Intent(MainActivity.this,MyIntentService.class));
     }
 
     @Override
