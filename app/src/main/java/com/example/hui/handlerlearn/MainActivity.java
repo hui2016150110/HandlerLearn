@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity{
     protected Button stop;
     @BindView(R2.id.random)
     protected TextView getRandom;
+    @BindView(R2.id.post)
+    protected Button post;
 
     private HandlerThread handlerThread;
     private Handler subHandler;
@@ -154,6 +156,28 @@ public class MainActivity extends AppCompatActivity{
     @OnClick(R.id.stop)
     protected void stopTask(){
         stopService(new Intent(MainActivity.this,MyIntentService.class));
+    }
+
+    @OnClick(R.id.post)
+    protected void testPost(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 *  post方法里面的Runnable对象，在handler中其实是一个callback，
+                 *  然后直接调用这个callback的run方法，这里并没有启动线程，所以post方法并不创建一个新的线程。
+                 *  由于是handler直接调用这个run方法，所以这个方法执行的线程就是handler创建的线程
+                 */
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i("threadName",Thread.currentThread().getName());
+                        post.setText("我改变了");
+                    }
+                });
+            }
+        },"subThread").start();
+
     }
 
     @Override
